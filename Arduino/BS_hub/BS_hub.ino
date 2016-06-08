@@ -18,6 +18,7 @@ const int transmit_en_pin = 29;
 #define MAX_SENSORES 5
 #define GSM_RX 2
 #define GSM_TX 3
+#define GSM_POWER 4
 
 
 // Comunicación con módulo SIM900
@@ -47,6 +48,8 @@ Sensor_STRUCT sensores[MAX_SENSORES];
  ****************************************/
 void setup()
 {
+  pinMode(GSM_POWER, OUTPUT);
+  
   Serial.begin(9600);	// Debugging
   while (!Serial) {
     ; // Espera a que se conecte. Se necesita sólo para USB nativo
@@ -264,7 +267,7 @@ void process_msg(struct Sensor_STRUCT *sD) // Debugging
 
 void loop()
 {
-
+  digitalWrite(GSM_POWER,LOW); // Apagar módulo GSM
   uint8_t buf[VW_MAX_MESSAGE_LEN];
   uint8_t buflen = VW_MAX_MESSAGE_LEN;
 
@@ -275,7 +278,11 @@ void loop()
       memcpy( &sData, buf, sizeof(sData)); // Copiar datos en estructura sesnsor
       Serial.print(F("\n\rMensaje recibido!!\n\r")); // Debugging
       process_msg(&sData); 
+digitalWrite(GSM_POWER,HIGH); // Encender módulo GSM
+delay(1000);       
 gsm_setup();
+delay(1000);
+
     }
     else
     {
