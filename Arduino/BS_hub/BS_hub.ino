@@ -191,7 +191,7 @@ void gsm_setup()
   // Test network
   res = gsm_cmd("AT+CREG?");
   int i = 0;
-  while (i < 10 && res.indexOf("+CREG: 0"))
+  while (i < 10 && (res.indexOf("+CREG: 0")>-1 || res.indexOf("+CREG: 2")>-1))
   {
     res = gsm_cmd("AT+CREG?");
     delay(500);
