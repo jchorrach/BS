@@ -193,8 +193,8 @@ void gsm_setup()
   */
   Serial.println(gsm_cmd("AT+CMGF=1"));
   
-  Serial.println(gsm_cmd("AT+CMGS = \"+34639635751\"","> "));  
-  res = "pau no toques";
+  Serial.println(gsm_cmd("AT+CMGS = \"+*********\"","> "));  
+  res = "Test envio SMS";
   Serial.println(gsm_cmd(res,"> ",500));
   Serial.println(gsm_cmd("^Z","> "));
   //gsm.print((char)26);
