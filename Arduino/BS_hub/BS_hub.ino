@@ -129,7 +129,9 @@ String sensorJson()
     info.concat(String(sensores[i].sen3,DEC));
     info.concat("},");  
   }
-  info = info.substring(0,info.length()-1)+"]}";
+  int len = info.length();
+  info = info.substring(0,len-1)+"]}";
+  info.concat("]}"); 
   return info;
 }
 
@@ -146,19 +148,23 @@ String gsm_cmd(String cmd, String fin = "\r\nOK\r\n", long timeout = 3000)
   long timeinit=millis();
   String res;
   char car;
+  
+  Serial.println("#"+cmd); // Debuggin
+  
   if (cmd=="^Z")
   {
     gsm.println((char) 26);
-    Serial.println("Se ha enviado un ctrl+z"); // Debugging
+    Serial.println("ctrl+z"); // Debugging
   }
   else
     gsm.println(cmd);
+    
   while (millis()-timeinit<timeout && !res.endsWith(fin) && !res.endsWith("\r\nERROR\r\n"))
   {
     if (gsm.available()) {
       car = gsm.read();
       int asc = car;
-      Serial.print(asc, DEC);
+      //Serial.print(asc, DEC); // Debuging
       res += car;
     }
   }
@@ -171,15 +177,18 @@ String gsm_cmd(String cmd, String fin = "\r\nOK\r\n", long timeout = 3000)
 void gsm_setup()
 {
   String res;
+  Serial.println("---------"); // Debugging
+  // Gestiona PIN de la SIM
   res = gsm_cmd("AT+CPIN?");
-  Serial.println("---------"); // Debugging
-  Serial.println(res);  
-  Serial.println("---------"); // Debugging
+
   if (res.indexOf("+CPIN: READY")==-1)
   {
      res = gsm_cmd("AT+CPIN=1024");
   }
+  
   //delay(1000);
+  // Test network 
+  res = gsm_cmd("AT+CREG?");
   /*
   Serial.println(gsm_cmd("AT+CGATT=1"));
   Serial.println(gsm_cmd("AT+SAPBR=3,1,\"CONTYPE\",\"GPRS\""));
@@ -194,17 +203,16 @@ void gsm_setup()
   Serial.println(gsm_cmd("AT+HTTPTERM"));
   Serial.println(gsm_cmd("AT+SAPBR=0,1"));
   */
-  Serial.println(gsm_cmd("AT+CMGF=1"));
-  
-  Serial.println(gsm_cmd("AT+CMGS = \"+*********\"","> "));  
-  res = "Test envio SMS";
-  Serial.println(gsm_cmd(res,"> ",500));
-  Serial.println(gsm_cmd("^Z","> "));
+  res = gsm_cmd("AT+CMGF=1");
+  res = gsm_cmd("AT+CMGS = \"+*********\"","> ");  
+  res = gsm_cmd("Test envio SMS","> ",500);
+  res = gsm_cmd("^Z");
   //gsm.print((char)26);
   //gsm.println();
   gsm.flush();
   Serial.println("\r\nMensaje enviado\r\n");
-  Serial.println(gsm_cmd("AT"));
+  res = gsm_cmd("AT");
+  Serial.println("---------"); // Debugging
 }
 
 void gsm_HTPP()
