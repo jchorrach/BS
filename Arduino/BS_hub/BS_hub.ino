@@ -132,7 +132,7 @@ String sensorJson()
     info.concat("},");
   }
   int len = info.length();
-  info = info.substring(0, len - 1) + "]}";
+  info = info.substring(0, len - 1);
   info.concat("]}");
   return info;
 }
@@ -191,12 +191,14 @@ void gsm_setup()
   // Test network
   res = gsm_cmd("AT+CREG?");
   int i = 0;
-  while (i < 10 && (res.indexOf("+CREG: 0")>-1 || res.indexOf("+CREG: 2")>-1))
+  while (i < 10 && (res.indexOf("+CREG: 0")>-1 || res.indexOf("+CREG: 2")>-1 || res.indexOf("+CREG: 3")>-1))
   {
     res = gsm_cmd("AT+CREG?");
     delay(500);
     i++;
   }
+  Serial.println("i:"); // Debugging
+  Serial.println(i); // Debugging
   /*
     Serial.println(gsm_cmd("AT+CGATT=1"));
     Serial.println(gsm_cmd("AT+SAPBR=3,1,\"CONTYPE\",\"GPRS\""));
@@ -212,7 +214,7 @@ void gsm_setup()
     Serial.println(gsm_cmd("AT+SAPBR=0,1"));
   */
   res = gsm_cmd("AT+CMGF=1");
-  res = gsm_cmd("AT+CMGS = \"+*********\"", "> ");
+  res = gsm_cmd("AT+CMGS = \"+34639635751\"", "> ");
   res = gsm_cmd("Test envio SMS", "> ", 500);
   res = gsm_cmd("^Z");
   //gsm.print((char)26);
@@ -245,7 +247,7 @@ void gsm_SMS(String text)
   String res;
   res = gsm_cmd("AT+CMGF=1");
 
-  res = gsm_cmd("AT+CMGS = \"+34639635751\"", "> ");
+  res = gsm_cmd("AT+CMGS = \"+*********\"", "> ");
 
   res = gsm_cmd(text, "> ", 1000);
   res = gsm_cmd("^Z", "> ", 1000);
@@ -283,7 +285,7 @@ void process_msg(struct Sensor_STRUCT *sD) // Debugging
 
 void loop()
 {
-  digitalWrite(GSM_POWER, LOW); // Apagar módulo GSM
+  digitalWrite(GSM_POWER, HIGH); // Apagar módulo GSM
   uint8_t buf[VW_MAX_MESSAGE_LEN];
   uint8_t buflen = VW_MAX_MESSAGE_LEN;
 
